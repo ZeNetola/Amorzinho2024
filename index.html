@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz dia dos namorados</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #ffe6e6;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        .container {
+            margin-top: 50px;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .date-input {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid pink;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: pink;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #ffcccc;
+        }
+        .card {
+            display: none;
+            background-color: white;
+            border: 2px solid pink;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px auto;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .card img {
+            width: 100%;
+            max-width: 300px;
+            height: 400px;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+        .hearts {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: red;
+            animation: bounce 1s infinite;
+        }
+        .hidden {
+            display: none;
+        }
+        .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .final-score {
+            font-size: 24px;
+            margin-top: 50px;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .final-photos {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 2s ease-in-out;
+            position: relative;
+        }
+        .photo-detail {
+            display: none;
+        }
+        .renew-button {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: pink;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .renew-button:hover {
+            background-color: #ffcccc;
+        }
+        #renew-video-container {
+            display: none;
+            animation: fadeIn 2s ease-in-out;
+        }
+        #renew-video {
+            width: 80%;
+            height: 400px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        @keyframes rise {
+            from {
+                opacity: 1;
+                bottom: 0;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                bottom: 100%;
+                transform: translateX(calc(var(--random-x) * 1px));
+            }
+        }
+        .photo-wall {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .photo-wall .photo-item {
+            background-color: white;
+            border: 2px solid pink;
+            border-radius: 15px;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+        .photo-wall .photo-item img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container animate__animated animate__fadeIn">
+        <h1>Quer jogar?</h1>
+        <input class="date-input" type="date" id="date-input" />
+        <button id="play-button" class="btn hidden" onclick="startGame()">Jogar</button>
+    </div>
+    <div class="hearts">❤️ Beijinhos: <span id="score">0</span></div>
+    <div id="card-container"></div>
+    <div class="final-score hidden" id="final-score"></div>
+    <button id="renew-button" class="renew-button disabled" onclick="renewContract()">Renovar Contrato (+1 ano)</button>
+    <div id="renew-video-container">
+        <video id="renew-video" autoplay>
+            <source src="your_video.mp4" type="video/mp4">
+            Seu navegador não suporta o elemento de vídeo.
+        </video>
+        <h2>Quero mais e mais memórias com você meu bem, eu te amo</h2>
+        <div id="video-photos" class="photo-wall"></div>
+        <h2>Outras memórias nossas</h2>
+        <div id="gallery-photos" class="photo-wall">
+            <div class="photo-item">
+                <img src="gallery1.jpeg" alt="Gallery Image 1">
+            </div>
+            <div class="photo-item">
+                <img src="gallery2.jpeg" alt="Gallery Image 2">
+            </div>
+            <div class="photo-item">
+                <img src="gallery3.jpeg" alt="Gallery Image 3">
+            </div>
+            <div class="photo-item">
+                <img src="gallery4.jpeg" alt="Gallery Image 4">
+            </div>
+        </div>
+    </div>
+    <script>
+        const correctDate = "2024-02-01";
+        const cards = [
+            {
+                img: "moment1.jpg",
+                description: "Ano novo com meu amor, dois esquisitos dando abracinhos na rua.",
+                detailedDescription: "Nesse dia eu tava preocupado porque achei que você não tava se divertindo muito, eu também te deixei sozinha porque precisei ir fazer pastéis kkkkkkkkkk mas deu tudo certo, você tava uma grandiosa gostosa de vestido, obrigado por ter passado o ano novo comigo e meus amigos estranhos.",
+                dates: ["01/01/2024", "31/12/2023", "01/01/2023"],
+                correctDate: "01/01/2024"
+            },
+            {
+                img: "moment2.jpeg",
+                description: "Formatura com meu amorzinho",
+                detailedDescription: "A formatura em si foi 0 especial pra mim, significou nada, mas estar com você foi muito bom e depois postar um story com você foi libertador, falar que tenho dono 💪",
+                dates: ["04/04/2024", "09/01/2024", "25/03/2024"],
+                correctDate: "25/03/2024"
+            },
+            {
+                img: "moment3.jpeg",
+                description: "Quando tudo começou, pelo menos oficialmente",
+                detailedDescription: "VERGONHA MEDO SOCORRO ME TIRA DAQUI.................. sou o homem mais feliz do mundo.",
+                dates: ["02/01/2024", "01/02/2024", "02/02/2024"],
+                correctDate: "01/02/2024"
+            },
+            {
+                img: "moment4.jpg",
+                description: "Rolê com Lê e Felipe, ela não queria que eu tirasse foto",
+                detailedDescription: "Esses rolês de quando a gente tava começando eram muitos questionáveis, porém muito bons, sinto saudades de ser um vagabundo apaixonado.",
+                dates: ["01/01/2024", "10/12/2023", "14/11/2023"],
+                correctDate: "10/12/2023"
+            },
+            {
+                img: "moment5.jpg",
+                description: "Momento com meu benzinho no macambira, dia que ela conheceu meus amigos estranhos.",
+                detailedDescription: "Eu não tinha certeza se você ia gostar dos meus amigos e se meus amigos iam gostar de você. Mas no final, você se deu bem com todos e isso me deixou muito feliz.",
+                dates: ["21/10/2023", "15/11/2023", "01/12/2023"],
+                correctDate: "21/10/2023"
+            }
+        ];
+        let currentCardIndex = 0;
+        let score = 0;
+        const minScore = 3;
+
+        document.getElementById('date-input').addEventListener('change', function() {
+            const inputDate = this.value;
+            if (inputDate === correctDate) {
+                document.getElementById('play-button').classList.remove('hidden');
+            } else {
+                document.getElementById('play-button').classList.add('hidden');
+            }
+        });
+
+        function startGame() {
+            document.querySelector('.container').classList.add('animate__fadeOut');
+            setTimeout(() => {
+                document.querySelector('.container').style.display = 'none';
+                showCard();
+            }, 1000);
+        }
+
+        function showCard() {
+            if (currentCardIndex < cards.length) {
+                const cardData = cards[currentCardIndex];
+                const cardContainer = document.getElementById('card-container');
+                cardContainer.innerHTML = `
+                    <div class="card animate__animated animate__fadeIn" id="card">
+                        <img src="${cardData.img}" alt="Foto">
+                        <p>${cardData.description}</p>
+                        ${cardData.dates.map(date => `<button class="btn" onclick="selectDate('${date}')">${date}</button>`).join('')}
+                    </div>
+                `;
+                cardContainer.querySelector('.card').style.display = 'block';
+            } else {
+                endGame();
+            }
+        }
+
+        function selectDate(selectedDate) {
+            const cardData = cards[currentCardIndex];
+            if (selectedDate === cardData.correctDate) {
+                score++;
+                animateHearts('❤️');
+            } else {
+                animateHearts('💔');
+            }
+            currentCardIndex++;
+            document.getElementById('card').classList.add('animate__fadeOut');
+            setTimeout(() => {
+                showCard();
+                updateScore();
+            }, 1000);
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function endGame() {
+            document.getElementById('card-container').innerHTML = '';
+            const finalScoreElement = document.getElementById('final-score');
+            finalScoreElement.classList.remove('hidden');
+            if (score < minScore) {
+                finalScoreElement.textContent = `Puta maldita esquecida! Você não atingiu nem o mínimo de beijinhos necessários. ${score} Beijinhos não dá nem pro cheiro.`;
+            } else {
+                finalScoreElement.textContent = `Boa meu bem, você atingiu o número de ${score} beijinhos. Isso significa que você ou tem uma memória boa ou deduziu quais datas clicar, de qualquer forma eu te amo. Vamos combinar de comemorar o próximo dia dos namorados também? E que tal o próximo depois do próximo? E assim por diante.`;
+                document.getElementById('renew-button').classList.remove('disabled');
+            }
+        }
+
+        function renewContract() {
+            const finalScoreElement = document.getElementById('final-score');
+            const renewButtonElement = document.getElementById('renew-button');
+            finalScoreElement.classList.add('hidden');
+            renewButtonElement.classList.add('hidden');
+
+            const videoContainer = document.getElementById('renew-video-container');
+            videoContainer.style.display = 'block';
+
+            const videoPhotosContainer = document.getElementById('video-photos');
+            videoPhotosContainer.innerHTML = cards.map(card => `
+                <div class="photo-item">
+                    <img src="${card.img}" alt="Foto">
+                    <p>${card.detailedDescription}</p>
+                </div>
+            `).join('');
+
+            document.getElementById('gallery-photos').style.display = 'flex';
+            document.getElementById('renew-video').play();
+        }
+
+        function animateHearts(heart) {
+            const numHearts = 20;
+            for (let i = 0; i < numHearts; i++) {
+                const heartElement = document.createElement('div');
+                heartElement.className = heart === '❤️' ? 'heart' : 'broken-heart';
+                heartElement.textContent = heart;
+                heartElement.style.left = `${Math.random() * 100}%`;
+                heartElement.style.fontSize = `${Math.random() * 10 + 14}px`;
+                heartElement.style.position = 'fixed';
+                heartElement.style.bottom = '0';
+                heartElement.style.animation = `rise 3s ease-in-out forwards`;
+                heartElement.style.setProperty('--random-x', `${Math.random() * 200 - 100}`);
+                document.body.appendChild(heartElement);
+                setTimeout(() => {
+                    heartElement.remove();
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
